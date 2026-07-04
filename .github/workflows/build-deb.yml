@@ -443,5 +443,6 @@ jobs:
           test -x /opt/Krate/bin/zen
           test -x /opt/Krate/bin/zenfw
           test -x /opt/Krate/bin/setup
+          test -x /opt/Krate/bin/krate-supportd
           # Version output is best-effort: full runtime (server/socket) is not provisioned in CI.
           /opt/Krate/bin/zen --version || true
