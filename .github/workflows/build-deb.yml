@@ -36,15 +36,15 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Create GitHub App token
-        id: app-token
+      # Client org: component repos (console, setup, web, docs, …).
+      - name: Create GitHub App token (krate-client)
+        id: app-token-client
         uses: actions/create-github-app-token@v3
         with:
           client-id: ${{ vars.KRATE_RELEASE_BOT_APP_ID }}
           private-key: ${{ secrets.KRATE_RELEASE_BOT_PRIVATE_KEY }}
           owner: krate-client
           repositories: |
-            tooling
             console
             setup
             web
@@ -54,11 +54,23 @@ jobs:
             docs
             krate
 
+      # Tools org: release scripts (formerly krate-client/tooling).
+      # Requires Krate Release Bot installed on krate-tools with access to scripts.
+      - name: Create GitHub App token (krate-tools)
+        id: app-token-tools
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ vars.KRATE_RELEASE_BOT_APP_ID }}
+          private-key: ${{ secrets.KRATE_RELEASE_BOT_PRIVATE_KEY }}
+          owner: krate-tools
+          repositories: |
+            scripts
+
       - name: Checkout release tools
         uses: actions/checkout@v6
         with:
-          repository: krate-client/tooling
-          token: ${{ steps.app-token.outputs.token }}
+          repository: krate-tools/scripts
+          token: ${{ steps.app-token-tools.outputs.token }}
           path: .tooling
 
       - name: Prepare tooling scripts
@@ -80,7 +92,7 @@ jobs:
       - name: Prepare environment variables
         shell: bash
         env:
-          KRATE_GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
+          KRATE_GITHUB_TOKEN: ${{ steps.app-token-client.outputs.token }}
           KRATE_MANIFEST_KEY_ZEN: ${{ secrets.KRATE_MANIFEST_KEY_ZEN }}
           KRATE_MANIFEST_KEY_ZENFW: ${{ secrets.KRATE_MANIFEST_KEY_ZENFW }}
           KRATE_MANIFEST_KEY_SETUP: ${{ secrets.KRATE_MANIFEST_KEY_SETUP }}
