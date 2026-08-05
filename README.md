@@ -83,4 +83,4 @@ Release changelogs are also published to [`docs`](https://github.com/krate-clien
 ## Documentation
 
 - [KRATE documentation](https://krate.github.io/docs/)
-- [Versioning rules](https://github.com/krate-client/tooling/blob/main/VERSIONING.md) (maintainers)
+- [Versioning rules](https://github.com/krate-tools/scripts/blob/main/VERSIONING.md) (maintainers)
