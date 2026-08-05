@@ -68,7 +68,7 @@ jobs:
 
       - name: Checkout release tools (krate-tools/scripts)
         id: checkout-scripts
-        if: steps.app-token-tools.outcome == 'success'
+        if: ${{ steps.app-token-tools.outcome == 'success' && steps.app-token-tools.outputs.token != '' }}
         continue-on-error: true
         uses: actions/checkout@v6
         with:
@@ -77,7 +77,7 @@ jobs:
           path: .tooling
 
       - name: Checkout release tools (fallback krate-client/tooling)
-        if: steps.app-token-tools.outcome != 'success' || steps.checkout-scripts.outcome != 'success'
+        if: ${{ steps.checkout-scripts.outcome != 'success' }}
         uses: actions/checkout@v6
         with:
           repository: krate-client/tooling
