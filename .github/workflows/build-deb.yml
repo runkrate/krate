@@ -45,6 +45,7 @@ jobs:
           private-key: ${{ secrets.KRATE_RELEASE_BOT_PRIVATE_KEY }}
           owner: krate-client
           repositories: |
+            tooling
             console
             setup
             web
@@ -54,10 +55,9 @@ jobs:
             docs
             krate
 
-      # Tools org: release scripts (formerly krate-client/tooling).
-      # Requires Krate Release Bot installed on krate-tools with access to scripts.
       - name: Create GitHub App token (krate-tools)
         id: app-token-tools
+        continue-on-error: true
         uses: actions/create-github-app-token@v3
         with:
           client-id: ${{ vars.KRATE_RELEASE_BOT_APP_ID }}
@@ -66,11 +66,22 @@ jobs:
           repositories: |
             scripts
 
-      - name: Checkout release tools
+      - name: Checkout release tools (krate-tools/scripts)
+        id: checkout-scripts
+        if: steps.app-token-tools.outcome == 'success'
+        continue-on-error: true
         uses: actions/checkout@v6
         with:
           repository: krate-tools/scripts
           token: ${{ steps.app-token-tools.outputs.token }}
+          path: .tooling
+
+      - name: Checkout release tools (fallback krate-client/tooling)
+        if: steps.app-token-tools.outcome != 'success' || steps.checkout-scripts.outcome != 'success'
+        uses: actions/checkout@v6
+        with:
+          repository: krate-client/tooling
+          token: ${{ steps.app-token-client.outputs.token }}
           path: .tooling
 
       - name: Prepare tooling scripts
