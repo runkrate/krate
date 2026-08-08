@@ -14,7 +14,7 @@ This repository is the **entry point** for installing and updating KRATE on your
 | [`console`](https://github.com/runkrate/console)                                                                                  | `zen` / `zenfw` — host operations and self-update              |
 | [`setup`](https://github.com/runkrate/setup)                                                                                      | First-install wizard                                           |
 | [`web`](https://github.com/runkrate/web)                                                                                          | HarmonyUI dashboard                                            |
-| [`apps-official`](https://github.com/runkrate/apps-official) / [`apps-community`](https://github.com/runkrate/apps-community) | Application catalogs shipped inside the package                |
+| [`core`](https://github.com/krate-apps/core) / [`community`](https://github.com/krate-apps/community) | Application catalogs shipped inside the package                |
 
 ## Install
 
@@ -73,10 +73,10 @@ The `krate` `.deb` bundles zen, zenfw, setup, HarmonyUI, and official and commun
 | Console (zen / zenfw) | [console](https://github.com/runkrate/console)               |
 | First-install wizard  | [setup](https://github.com/runkrate/setup)                   |
 | Web interface         | [web](https://github.com/runkrate/web)                       |
-| Official apps         | [apps-official](https://github.com/runkrate/apps-official)   |
-| Community apps        | [apps-community](https://github.com/runkrate/apps-community) |
+| Official apps         | [core](https://github.com/krate-apps/core)                   |
+| Community apps        | [community](https://github.com/krate-apps/community)         |
 
-Optional add-ons and plugins for individual apps live in [`apps-extensions`](https://github.com/runkrate/apps-extensions) — not bundled in the core package.
+Optional add-ons and plugins for individual apps live in [`extensions`](https://github.com/krate-apps/extensions) — not bundled in the core package.
 
 Release changelogs are also published to [`docs`](https://github.com/runkrate/docs) under `docs/changelogs/`.
 

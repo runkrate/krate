@@ -49,11 +49,20 @@ jobs:
             console
             setup
             web
-            apps-official
-            apps-official-source
-            apps-community
             docs
             krate
+
+      - name: Create GitHub App token (krate-apps)
+        id: app-token-apps
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ vars.KRATE_RELEASE_BOT_APP_ID }}
+          private-key: ${{ secrets.KRATE_RELEASE_BOT_PRIVATE_KEY }}
+          owner: krate-apps
+          repositories: |
+            core
+            sources
+            community
 
       - name: Create GitHub App token (krate-tools)
         id: app-token-tools
@@ -104,6 +113,7 @@ jobs:
         shell: bash
         env:
           KRATE_GITHUB_TOKEN: ${{ steps.app-token-client.outputs.token }}
+          KRATE_GITHUB_TOKEN_APPS: ${{ steps.app-token-apps.outputs.token }}
           KRATE_MANIFEST_KEY_ZEN: ${{ secrets.KRATE_MANIFEST_KEY_ZEN }}
           KRATE_MANIFEST_KEY_ZENFW: ${{ secrets.KRATE_MANIFEST_KEY_ZENFW }}
           KRATE_MANIFEST_KEY_SETUP: ${{ secrets.KRATE_MANIFEST_KEY_SETUP }}
@@ -140,12 +150,18 @@ jobs:
               "${KRATE_GITHUB_TOKEN}" "$1"
           }
 
+          clone_url_apps() {
+            printf 'https://x-access-token:%s@github.com/krate-apps/%s.git' \
+              "${KRATE_GITHUB_TOKEN_APPS}" "$1"
+          }
+
           write_env KRATE_CONSOLE_REPO "$(clone_url console)"
           write_env KRATE_SETUP_REPO "$(clone_url setup)"
           write_env KRATE_WEB_REPO "$(clone_url web)"
-          write_env KRATE_APPS_OFFICIAL_REPO "$(clone_url apps-official)"
-          write_env KRATE_APPS_OFFICIAL_SOURCE_REPO "$(clone_url apps-official-source)"
-          write_env KRATE_APPS_COMMUNITY_REPO "$(clone_url apps-community)"
+          # Env var names stay KRATE_APPS_*; clone dirs in build-deb.sh stay apps-*.
+          write_env KRATE_APPS_OFFICIAL_REPO "$(clone_url_apps core)"
+          write_env KRATE_APPS_OFFICIAL_SOURCE_REPO "$(clone_url_apps sources)"
+          write_env KRATE_APPS_COMMUNITY_REPO "$(clone_url_apps community)"
           write_pem_env KRATE_MANIFEST_KEY_ZEN "${KRATE_MANIFEST_KEY_ZEN}"
           write_pem_env KRATE_MANIFEST_KEY_ZENFW "${KRATE_MANIFEST_KEY_ZENFW}"
           write_pem_env KRATE_MANIFEST_KEY_SETUP "${KRATE_MANIFEST_KEY_SETUP}"
