@@ -37,13 +37,13 @@ jobs:
           fetch-depth: 0
 
       # Client org: component repos (console, setup, web, docs, …).
-      - name: Create GitHub App token (krate-client)
+      - name: Create GitHub App token (runkrate)
         id: app-token-client
         uses: actions/create-github-app-token@v3
         with:
           client-id: ${{ vars.KRATE_RELEASE_BOT_APP_ID }}
           private-key: ${{ secrets.KRATE_RELEASE_BOT_PRIVATE_KEY }}
-          owner: krate-client
+          owner: runkrate
           repositories: |
             tooling
             console
@@ -76,11 +76,11 @@ jobs:
           token: ${{ steps.app-token-tools.outputs.token }}
           path: .tooling
 
-      - name: Checkout release tools (fallback krate-client/tooling)
+      - name: Checkout release tools (fallback runkrate/tooling)
         if: ${{ steps.checkout-scripts.outcome != 'success' }}
         uses: actions/checkout@v6
         with:
-          repository: krate-client/tooling
+          repository: runkrate/tooling
           token: ${{ steps.app-token-client.outputs.token }}
           path: .tooling
 
@@ -136,7 +136,7 @@ jobs:
           }
 
           clone_url() {
-            printf 'https://x-access-token:%s@github.com/krate-client/%s.git' \
+            printf 'https://x-access-token:%s@github.com/runkrate/%s.git' \
               "${KRATE_GITHUB_TOKEN}" "$1"
           }
 
@@ -428,7 +428,7 @@ jobs:
         run: |
           apt-get install -y --no-install-recommends nodejs npm
           clone_url() {
-            printf 'https://x-access-token:%s@github.com/krate-client/docs.git' \
+            printf 'https://x-access-token:%s@github.com/runkrate/docs.git' \
               "${GITHUB_TOKEN}"
           }
           .tooling/scripts/publish-krate-docs-changelog.sh \

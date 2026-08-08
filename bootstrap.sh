@@ -5,7 +5,7 @@
 #   sudo ./bootstrap.sh --beta    # latest pre-release (temporary flag)
 set -euo pipefail
 
-KRATE_RELEASES_REPO="${KRATE_RELEASES_REPO:-krate-client/krate}"
+KRATE_RELEASES_REPO="${KRATE_RELEASES_REPO:-runkrate/krate}"
 CHANNEL="stable"
 WORK_DIR=""
 
