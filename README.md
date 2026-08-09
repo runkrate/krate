@@ -14,7 +14,7 @@ This repository is the **entry point** for installing and updating KRATE on your
 | [`console`](https://github.com/runkrate/console)                                                                                  | `zen` / `zenfw` — host operations and self-update              |
 | [`setup`](https://github.com/runkrate/setup)                                                                                      | First-install wizard                                           |
 | [`web`](https://github.com/runkrate/web)                                                                                          | HarmonyUI dashboard                                            |
-| [`core`](https://github.com/krate-apps/core) / [`community`](https://github.com/krate-apps/community) | Application catalogs shipped inside the package                |
+| [`sources`](https://github.com/krate-apps/sources) → [`core`](https://github.com/krate-apps/core) / [`community`](https://github.com/krate-apps/community) | Application catalogs shipped inside the package |
 
 ## Install
 
