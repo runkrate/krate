@@ -1,86 +1,112 @@
+<!-- KRATE-README-HEADER:START -->
+<p align="center">
+  <a href="https://github.com/runkrate">
+    <img src="https://raw.githubusercontent.com/runkrate/.github/main/assets/logo/logo.png" alt="KRATE" width="128" />
+  </a>
+</p>
+
+<p align="center">
+  <a href="https://github.com/runkrate/krate/stargazers"><img src="https://img.shields.io/github/stars/runkrate/krate?style=flat-square&logo=github" alt="GitHub stars" /></a>
+  <a href="https://github.com/runkrate/hub/issues"><img src="https://img.shields.io/github/issues-search/runkrate/hub?query=is%3Aopen&style=flat-square&label=issues%2FPRs" alt="Open issues and pull requests" /></a>
+  <a href="https://github.com/runkrate/krate/releases"><img src="https://img.shields.io/github/v/release/runkrate/krate?style=flat-square&label=version" alt="Current version" /></a>
+  <a href="https://github.com/runkrate/krate/blob/main/LICENSE"><img src="https://img.shields.io/github/license/runkrate/krate?style=flat-square" alt="License" /></a>
+</p>
+
+<p align="center">
+  <a href="https://runkrate.com"><img src="https://img.shields.io/badge/Website-runkrate.com-0A66C2?style=flat-square" alt="Website" /></a>
+  <a href="https://runkrate.com/docs"><img src="https://img.shields.io/badge/Docs-runkrate.com%2Fdocs-111827?style=flat-square" alt="Docs" /></a>
+  <a href="https://ko-fi.com/krate"><img src="https://img.shields.io/badge/Ko--fi-Support-FF5E5B?style=flat-square&logo=ko-fi&logoColor=white" alt="Ko-fi" /></a>
+  <a href="https://buymeacoffee.com/krate"><img src="https://img.shields.io/badge/Buy%20Me%20a%20Coffee-Support-FFDD00?style=flat-square&logo=buymeacoffee&logoColor=black" alt="Buy Me a Coffee" /></a>
+</p>
+<!-- KRATE-README-HEADER:END -->
+
 # KRATE
 
-Official downloads for [KRATE](https://krate.github.io/docs/) on Debian: installable `.deb` packages, checksums, release manifest, and changelogs.
+Self-hosted media and automation for Linux servers.
+
+**This repository is where you download KRATE.** Releases here are the only builds meant for end users. Source for each component lives in other repositories; those are not alternate installers.
 
 **License:** [BSD-3-Clause](LICENSE)
 
-This repository is the **entry point** for installing and updating KRATE on your server. Source code for each component lives in separate repositories; this repo only publishes built packages.
-
-## Role in the stack
-
-| Layer                                                                                                                                 | Responsibility                                                 |
-| ------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
-| **`krate`** (this repo)                                                                                                               | Package downloads, release tags, `krate-release.json` manifest |
-| [`console`](https://github.com/runkrate/console)                                                                                  | `zen` / `zenfw` — host operations and self-update              |
-| [`setup`](https://github.com/runkrate/setup)                                                                                      | First-install wizard                                           |
-| [`web`](https://github.com/runkrate/web)                                                                                          | HarmonyUI dashboard                                            |
-| [`sources`](https://github.com/krate-apps/sources) → [`core`](https://github.com/krate-apps/core) / [`community`](https://github.com/krate-apps/community) | Application catalogs shipped inside the package |
-
 ## Install
 
-### Quick install (recommended)
+**Requirements:** Debian 13 (trixie), **amd64** only for now. Support for other OS / architectures will be added later.
 
-On a supported Debian host, download and install the latest release in one step:
+### Quick install (recommended)
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/runkrate/krate/main/bootstrap.sh | sudo bash
 ```
 
-Pre-release (testing):
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/runkrate/krate/main/bootstrap.sh | sudo bash -s -- --beta
-```
-
-The script detects your OS, fetches `krate-release.json` from GitHub, downloads the matching `.deb`, verifies its SHA256 checksum, and installs it with `apt-get`.
+The script detects your OS, downloads the matching `.deb` from this repo’s releases, verifies its checksum, and installs it with `apt-get`.
 
 ### Manual install
 
-Pick a build from [GitHub Releases](https://github.com/runkrate/krate/releases):
+Prefer the bootstrap above when you can. For a fully manual install, open a root shell first (`sudo -i` or `sudo -s`) and run every step as root — do not mix an unprivileged download with a later `sudo` install.
 
-| Channel         | Tag pattern      | Use when                 |
-| --------------- | ---------------- | ------------------------ |
-| **stable**      | `v1.2.3`         | Production servers       |
-| **pre-release** | `v1.2.3-alpha.N` | Testing upcoming changes |
-
-Each release ships one `.deb` per enabled platform (filename includes the OS codename, e.g. `krate_1.2.3-trixie_amd64.deb`), a `SHA256SUMS` file, and `krate-release.json`. Pre-release tags may also include `TESTING.md` (maintained in [`prerelease/TESTING.md`](prerelease/TESTING.md)) when it contains a manual testing checklist for beta testers.
+Pick a release tag from [GitHub Releases](https://github.com/runkrate/krate/releases), then set the variables to match your host and the asset names on that release:
 
 ```bash
-wget https://github.com/runkrate/krate/releases/download/<tag>/krate_<version>-trixie_amd64.deb
-sha256sum -c SHA256SUMS
-sudo dpkg -i krate_<version>-trixie_amd64.deb
+sudo -i
+
+# Example values — replace with the tag/version and platform you want
+VERSION=1.2.3          # package version (no leading "v")
+TAG=v${VERSION}        # GitHub release tag
+CODENAME=trixie        # Debian codename in the .deb filename
+ARCH=amd64
+
+BASE="https://github.com/runkrate/krate/releases/download/${TAG}"
+DEB="krate_${VERSION}-${CODENAME}_${ARCH}.deb"
+
+# Download package + checksums (curl or wget)
+curl -fLO "${BASE}/${DEB}"
+curl -fLO "${BASE}/SHA256SUMS"
+# wget -q "${BASE}/${DEB}" "${BASE}/SHA256SUMS"
+
+# Verify SHA256 (checks only the files you downloaded)
+sha256sum -c --ignore-missing SHA256SUMS
+
+# Install the .deb
+apt-get update
+apt-get install -y "./${DEB}"
+# alternative: dpkg -i "./${DEB}" && apt-get install -f -y
 ```
 
-Then configure `/root/krate.conf` and run [`setup`](https://github.com/runkrate/setup).
+Then configure the host and finish first-time setup (still as root):
+
+```bash
+nano /root/krate.conf
+/opt/Krate/bin/setup
+```
+
+See the [documentation](https://runkrate.com/docs) for `krate.conf` fields and post-install steps.
+
+| Channel     | Tag pattern                     | Use when   |
+| ----------- | ------------------------------- | ---------- |
+| Stable      | `v1.2.3`                        | Production |
+| Pre-release | `v1.2.3-beta.N` / `v1.2.3-rc.N` | Testing    |
 
 ## Update
 
-On an installed host, `zen pull` reads `krate-release.json`, verifies the checksum, and installs the matching `.deb` for your platform:
+On an installed host:
 
 ```bash
-zen pull --check    # report available update without installing
+zen pull --check    # check only
 zen pull            # download and install
 ```
 
-Set `update_channel` in `/etc/krate/environment.d/zenfw.conf.local` (written by setup from `branch=` in `krate.conf`) to choose **main** (stable) or **beta** (pre-release) updates.
-
 ## What is in the package
 
-The `krate` `.deb` bundles zen, zenfw, setup, HarmonyUI, and official and community application catalogs.
+The `.deb` bundles **console** (`zen` / `zenfw`), **setup**, **HarmonyUI**, and the **official** and **community** application catalogs.
 
-| Component             | Repository                                                       |
-| --------------------- | ---------------------------------------------------------------- |
-| Console (zen / zenfw) | [console](https://github.com/runkrate/console)               |
-| First-install wizard  | [setup](https://github.com/runkrate/setup)                   |
-| Web interface         | [web](https://github.com/runkrate/web)                       |
-| Official apps         | [core](https://github.com/krate-apps/core)                   |
-| Community apps        | [community](https://github.com/krate-apps/community)         |
+Optional add-ons for individual apps are published separately in [`krate-apps/extensions`](https://github.com/krate-apps/extensions) — they are not required for a normal install.
 
-Optional add-ons and plugins for individual apps live in [`extensions`](https://github.com/krate-apps/extensions) — not bundled in the core package.
+## Useful links
 
-Release changelogs are also published to [`docs`](https://github.com/runkrate/docs) under `docs/changelogs/`.
+- [Documentation](https://runkrate.com/docs)
+- [Report a bug or suggest a feature](https://github.com/runkrate/hub/issues)
+- [Release changelogs](https://github.com/runkrate/docs/tree/main/docs/changelogs)
 
-## Documentation
+## Contributing
 
-- [KRATE documentation](https://krate.github.io/docs/)
-- [Versioning rules](https://github.com/krate-tools/scripts/blob/main/VERSIONING.md) (maintainers)
+Source for the components shipped in this package lives in sibling repositories (`console`, `setup`, `web`, app catalogs, …). See the [contributing guide](https://github.com/runkrate/docs/blob/main/CONTRIBUTING.md) for how to report issues and open pull requests.
