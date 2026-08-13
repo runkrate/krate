@@ -7,7 +7,6 @@
 
 <p align="center">
   <a href="https://github.com/runkrate/krate/stargazers"><img src="https://img.shields.io/github/stars/runkrate/krate?style=flat-square&logo=github" alt="GitHub stars" /></a>
-  <a href="https://github.com/runkrate/hub/issues"><img src="https://img.shields.io/github/issues-search/runkrate/hub?query=is%3Aopen&style=flat-square&label=issues%2FPRs" alt="Open issues and pull requests" /></a>
   <a href="https://github.com/runkrate/krate/releases"><img src="https://img.shields.io/github/v/release/runkrate/krate?style=flat-square&label=version" alt="Current version" /></a>
   <a href="https://github.com/runkrate/krate/blob/main/LICENSE"><img src="https://img.shields.io/github/license/runkrate/krate?style=flat-square" alt="License" /></a>
 </p>
@@ -15,22 +14,42 @@
 <p align="center">
   <a href="https://runkrate.com"><img src="https://img.shields.io/badge/Website-runkrate.com-0A66C2?style=flat-square" alt="Website" /></a>
   <a href="https://runkrate.com/docs"><img src="https://img.shields.io/badge/Docs-runkrate.com%2Fdocs-111827?style=flat-square" alt="Docs" /></a>
-  <a href="https://ko-fi.com/krate"><img src="https://img.shields.io/badge/Ko--fi-Support-FF5E5B?style=flat-square&logo=ko-fi&logoColor=white" alt="Ko-fi" /></a>
-  <a href="https://buymeacoffee.com/krate"><img src="https://img.shields.io/badge/Buy%20Me%20a%20Coffee-Support-FFDD00?style=flat-square&logo=buymeacoffee&logoColor=black" alt="Buy Me a Coffee" /></a>
+  <a href="https://github.com/runkrate/hub/issues"><img src="https://img.shields.io/github/issues-search/runkrate/hub?query=is%3Aopen&style=flat-square&label=issues%2FPRs" alt="Open issues and pull requests" /></a>
 </p>
 <!-- KRATE-README-HEADER:END -->
 
 # KRATE
 
-Self-hosted media and automation for Linux servers.
+**Your server. Your apps. One simple platform.**
 
-**This repository is where you download KRATE.** Releases here are the only builds meant for end users. Source for each component lives in other repositories; those are not alternate installers.
+KRATE turns a fresh Debian server into a managed home for your media and automation stack.
 
-**License:** [BSD-3-Clause](LICENSE)
+**This is the official KRATE distribution repository.** Releases published here are the official builds intended for end users.
 
-## Install
+## What is KRATE?
 
-**Requirements:** Debian 13 (trixie), **amd64** only for now. Support for other OS / architectures will be added later.
+KRATE is a self-hosted platform for managing media and automation applications on your own Linux server.
+
+It provides:
+
+- **zen** — CLI for installation, updates, and server administration
+- **HarmonyUI** — web interface for managing your stack
+- **Application catalogs** — official and community applications
+- **Built-in updates** — safely download, verify, and install releases
+- **Bare-metal deployment** — no Docker required
+
+## Requirements
+
+| Requirement | Support |
+| --- | --- |
+| **OS** | Debian 13 (trixie) |
+| **Architecture** | amd64 |
+| **Installation** | Bare metal |
+| **Docker** | Not required |
+
+Additional operating systems and architectures are planned.
+
+## Installation
 
 ### Quick install (recommended)
 
@@ -38,9 +57,14 @@ Self-hosted media and automation for Linux servers.
 curl -fsSL https://raw.githubusercontent.com/runkrate/krate/main/bootstrap.sh | sudo bash
 ```
 
-The script detects your OS, downloads the matching `.deb` from this repo’s releases, verifies its checksum, and installs it with `apt-get`.
+The bootstrap script does not install arbitrary software from third-party repositories. It downloads the official KRATE package from [GitHub Releases](https://github.com/runkrate/krate/releases), verifies its checksum, and installs it through APT.
 
-### Manual install
+> **Security:** KRATE releases are published through GitHub Releases and verified before installation.
+
+After install, edit `/root/krate.conf` and run `setup`. See the [documentation](https://runkrate.com/docs) for details.
+
+<details>
+<summary><strong>Manual installation</strong></summary>
 
 Prefer the bootstrap above when you can. For a fully manual install, open a root shell first (`sudo -i` or `sudo -s`) and run every step as root — do not mix an unprivileged download with a later `sudo` install.
 
@@ -79,27 +103,75 @@ nano /root/krate.conf
 /opt/Krate/bin/setup
 ```
 
-See the [documentation](https://runkrate.com/docs) for `krate.conf` fields and post-install steps.
+| Channel | Tag pattern | Use when |
+| --- | --- | --- |
+| Stable | `v1.2.3` | Production |
+| Pre-release | `v1.2.3-beta.N` / `v1.2.3-rc.N` | Testing |
 
-| Channel     | Tag pattern                     | Use when   |
-| ----------- | ------------------------------- | ---------- |
-| Stable      | `v1.2.3`                        | Production |
-| Pre-release | `v1.2.3-beta.N` / `v1.2.3-rc.N` | Testing    |
+</details>
 
-## Update
+## Updates
 
-On an installed host:
+KRATE manages its own updates through `zen`.
 
 ```bash
-zen pull --check    # check only
-zen pull            # download and install
+zen pull --check    # report available update without installing
+zen pull            # download, verify, and install
 ```
 
-## What is in the package
+`zen pull` checks for a newer KRATE release, downloads the matching package for your platform, verifies it, and installs the update.
 
-The `.deb` bundles **console** (`zen` / `zenfw`), **setup**, **HarmonyUI**, and the **official** and **community** application catalogs.
+## What's included
 
-Optional add-ons for individual apps are published separately in [`krate-apps/extensions`](https://github.com/krate-apps/extensions) — they are not required for a normal install.
+Every KRATE `.deb` package includes:
+
+- **zen** — KRATE administration CLI
+- **zenfw** — framework / runtime components
+- **setup** — first-time host configuration
+- **HarmonyUI** — web administration interface
+- **Official application catalog**
+- **Community application catalog**
+
+Application-specific extensions are distributed separately in [`krate-apps/extensions`](https://github.com/krate-apps/extensions) and are not required for a normal install.
+
+## Architecture
+
+| Component | Purpose |
+| --- | --- |
+| **zen** | CLI and day-to-day host operations |
+| **HarmonyUI** | Web administration interface |
+| **App catalogs** | Application definitions and integrations |
+
+### Repository structure
+
+This repository contains the official KRATE **distribution** packages.
+
+KRATE itself is composed of several open-source components maintained in separate repositories. Those repositories contain **source code**, not alternative KRATE distributions.
+
+**If you want to install KRATE, use this repository’s releases.**
+
+```text
+runkrate/
+├── krate      ← official distribution / releases  (this repo)
+├── console    ← zen / zenfw source
+├── setup      ← first-install wizard source
+├── web        ← HarmonyUI source
+└── docs       ← documentation sources
+```
+
+Application catalogs live under [`krate-apps`](https://github.com/krate-apps) (`core`, `community`, `extensions`).
+
+## Project status
+
+KRATE is actively developed.
+
+The current release supports:
+
+- Debian 13 (trixie)
+- amd64
+- bare-metal installations
+
+Additional operating systems and architectures are planned.
 
 ## Useful links
 
@@ -107,6 +179,16 @@ Optional add-ons for individual apps are published separately in [`krate-apps/ex
 - [Report a bug or suggest a feature](https://github.com/runkrate/hub/issues)
 - [Release changelogs](https://github.com/runkrate/docs/tree/main/docs/changelogs)
 
+## Supporting KRATE
+
+KRATE is primarily funded through its paid licenses. If you’d like to support the project beyond that, you can make a one-time contribution on [Ko-fi](https://ko-fi.com/krate).
+
+More details: [`FUNDING.md`](https://github.com/runkrate/.github/blob/main/FUNDING.md)
+
 ## Contributing
 
-Source for the components shipped in this package lives in sibling repositories (`console`, `setup`, `web`, app catalogs, …). See the [contributing guide](https://github.com/runkrate/docs/blob/main/CONTRIBUTING.md) for how to report issues and open pull requests.
+Source for the components shipped in this package lives in sibling repositories. See the [contributing guide](https://github.com/runkrate/docs/blob/main/CONTRIBUTING.md) for how to report issues and open pull requests. Bug reports and feature ideas go to [hub](https://github.com/runkrate/hub).
+
+## License
+
+KRATE distribution packages in this repository are licensed under the [BSD 3-Clause License](LICENSE).
