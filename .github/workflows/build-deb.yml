@@ -32,7 +32,7 @@ jobs:
           git config --global --add safe.directory "${GITHUB_WORKSPACE}"
 
       - name: Checkout krate repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
@@ -79,7 +79,7 @@ jobs:
         id: checkout-scripts
         if: ${{ steps.app-token-tools.outcome == 'success' && steps.app-token-tools.outputs.token != '' }}
         continue-on-error: true
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           repository: krate-tools/scripts
           token: ${{ steps.app-token-tools.outputs.token }}
@@ -87,7 +87,7 @@ jobs:
 
       - name: Checkout release tools (fallback runkrate/tooling)
         if: ${{ steps.checkout-scripts.outcome != 'success' }}
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           repository: runkrate/tooling
           token: ${{ steps.app-token-client.outputs.token }}
