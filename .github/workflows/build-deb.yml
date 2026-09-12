@@ -353,8 +353,12 @@ jobs:
         shell: bash
         run: |
           cd dist/deb
-          sha256sum *.deb > SHA256SUMS
+          targets=(*.deb)
+          [[ -f CATALOG.json ]] && targets+=(CATALOG.json)
+          [[ -f software_catalog.json ]] && targets+=(software_catalog.json)
+          sha256sum "${targets[@]}" > SHA256SUMS
           sha256sum -c SHA256SUMS
+          ls -la
 
       - name: Stage pre-release testing checklist
         if: inputs.channel == 'pre-release'
@@ -392,6 +396,8 @@ jobs:
           path: |
             dist/deb/SHA256SUMS
             dist/deb/krate-release.json
+            dist/deb/CATALOG.json
+            dist/deb/software_catalog.json
           if-no-files-found: error
 
       - name: Publish GitHub release
@@ -407,6 +413,8 @@ jobs:
             dist/deb/*.deb
             dist/deb/SHA256SUMS
             dist/deb/krate-release.json
+            dist/deb/CATALOG.json
+            dist/deb/software_catalog.json
 
       - name: Prepare pre-release release assets
         if: inputs.channel == 'pre-release'
@@ -417,6 +425,8 @@ jobs:
             echo "dist/deb/*.deb"
             echo "dist/deb/SHA256SUMS"
             echo "dist/deb/krate-release.json"
+            echo "dist/deb/CATALOG.json"
+            echo "dist/deb/software_catalog.json"
             if [[ -f dist/deb/TESTING.md ]] && grep -q '[^[:space:]]' dist/deb/TESTING.md; then
               echo "dist/deb/TESTING.md"
             fi
