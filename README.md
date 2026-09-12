@@ -108,6 +108,14 @@ nano /root/krate.conf
 | Stable | `v1.2.3` | Production |
 | Pre-release | `v1.2.3-beta.N` / `v1.2.3-rc.N` | Testing |
 
+Each GitHub release also publishes the application catalog alongside the `.deb`:
+
+| Asset | Purpose |
+| --- | --- |
+| `CATALOG.json` | Signed host catalog (same file as in the package) |
+| `software_catalog.json` | Slim extract for Attune / runkrate.com |
+| `krate-release.json` | Platform manifest (`zen pull`) |
+
 </details>
 
 ## Updates
