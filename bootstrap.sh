@@ -166,11 +166,14 @@ RELEASE_JSON="${WORK_DIR}/releases.json"
 curl -fsSL \
 	-H "Accept: application/vnd.github+json" \
 	-H "X-GitHub-Api-Version: 2022-11-28" \
-	"https://api.github.com/repos/${KRATE_RELEASES_REPO}/releases?per_page=30" \
+	"https://api.github.com/repos/${KRATE_RELEASES_REPO}/releases?per_page=100" \
 	-o "${RELEASE_JSON}"
 
+# GitHub lists releases by created_at. These tags share one created_at, so the
+# first row is not the newest publish (beta.9 can precede beta.12).
 mapfile -t _pick < <(python3 - "${CHANNEL}" "${RELEASE_JSON}" <<'PY'
 import json
+import re
 import sys
 
 channel = sys.argv[1]
@@ -178,6 +181,18 @@ want_prerelease = channel == "pre-release"
 with open(sys.argv[2], encoding="utf-8") as handle:
     releases = json.load(handle)
 
+
+def version_key(tag: str):
+    parts = []
+    for chunk in re.split(r"[.~+-]", tag.lstrip("vV")):
+        if chunk.isdigit():
+            parts.append((0, int(chunk)))
+        elif chunk:
+            parts.append((1, chunk))
+    return tuple(parts)
+
+
+best = None
 for release in releases:
     if release.get("draft"):
         continue
@@ -191,12 +206,17 @@ for release in releases:
             break
     if not tag or not manifest_url:
         continue
-    print(tag)
-    print(manifest_url)
-    sys.exit(0)
+    published = release.get("published_at") or ""
+    candidate = (version_key(tag), published, tag, manifest_url)
+    if best is None or candidate[:2] > best[:2]:
+        best = candidate
 
-print(f"ERROR: no {channel} release found on GitHub", file=sys.stderr)
-sys.exit(1)
+if best is None:
+    print(f"ERROR: no {channel} release found on GitHub", file=sys.stderr)
+    sys.exit(1)
+
+print(best[2])
+print(best[3])
 PY
 )
 if [[ ${#_pick[@]} -lt 2 ]]; then
