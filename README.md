@@ -61,6 +61,8 @@ The bootstrap script does not install arbitrary software from third-party reposi
 
 > **Security:** KRATE releases are published through GitHub Releases and verified before installation.
 
+To install the latest beta, append `-s -- --beta` to `sudo bash`. This also sets `branch="beta"` in `/root/krate.conf`, so setup keeps subsequent updates on the beta channel.
+
 After install, edit `/root/krate.conf` and run `setup`. See the [documentation](https://runkrate.com/docs) for details.
 
 <details>

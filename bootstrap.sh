@@ -17,7 +17,7 @@ Detect the host OS, download the matching krate .deb from the latest GitHub
 release, verify its SHA256 checksum, and install it with apt.
 
   (default)   Latest stable release
-  --beta      Latest pre-release (flag will be removed in a future version)
+  --beta      Latest pre-release; set branch="beta" in /root/krate.conf
 
 Requires: root, curl, python3, sha256sum, apt-get
 EOF
@@ -400,6 +400,33 @@ DEBIAN_FRONTEND=noninteractive apt-get update -y
 
 echo "==> Installing ${DEB_NAME}"
 DEBIAN_FRONTEND=noninteractive apt-get install -y "${DEB_PATH}"
+
+# postinst creates krate.conf; persist the selected beta channel for setup and zen pull.
+if [[ "${CHANNEL}" == "pre-release" ]]; then
+	echo "==> Configuring beta update channel"
+	python3 - /root/krate.conf <<'PYCONF'
+import pathlib
+import re
+import sys
+
+path = pathlib.Path(sys.argv[1])
+text = path.read_text(encoding="utf-8")
+lines = []
+written = False
+for line in text.splitlines(keepends=True):
+    if re.match(r'^\s*(?:#\s*)?(?:export\s+)?branch\s*=', line):
+        if not written:
+            lines.append('branch="beta"\n')
+            written = True
+    else:
+        lines.append(line)
+if not written:
+    if lines and not lines[-1].endswith("\n"):
+        lines.append("\n")
+    lines.append('branch="beta"\n')
+path.write_text("".join(lines), encoding="utf-8")
+PYCONF
+fi
 
 echo "==> Done. KRATE ${PACKAGE_VERSION} (${RELEASE_TAG}) is installed."
 echo "    Next: configure /root/krate.conf and run setup"
