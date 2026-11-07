@@ -157,6 +157,9 @@ jobs:
           write_env KRATE_CONSOLE_REPO "$(clone_url console)"
           write_env KRATE_SETUP_REPO "$(clone_url setup)"
           write_env KRATE_WEB_REPO "$(clone_url web)"
+          # Public catalogs — no App token. build-deb.sh maps channel → ref:
+          # stable → main, pre-release → develop.
+          write_env KRATE_TRANSLATIONS_REPO "https://github.com/runkrate/translations.git"
           # Env var names stay KRATE_APPS_*; clone dirs in build-deb.sh stay apps-*.
           write_env KRATE_APPS_OFFICIAL_REPO "$(clone_url_apps core)"
           write_env KRATE_APPS_OFFICIAL_SOURCE_REPO "$(clone_url_apps sources)"
